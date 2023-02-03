@@ -142,7 +142,7 @@ export const app = async (
     try {
       const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
         await page.goto(url, {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
+          waitUntil: 'networkidle0',
         })
         const pdfOptions = server.getPDFOptions(pdfOptionsQuery)
         return await page.pdf(pdfOptions)

@@ -24,7 +24,7 @@ RUN apt-get update \
   && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
   && apt-get update && apt-get upgrade -y
 RUN apt-get install -y ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1
-RUN apt-get install -y google-chrome-stable \
+RUN apt-get install -y google-chrome-beta \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
@@ -34,7 +34,7 @@ RUN fc-cache -fv
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-  PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-beta
 
 EXPOSE 8080
 
