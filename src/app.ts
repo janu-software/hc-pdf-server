@@ -1,23 +1,27 @@
 import fastify, { FastifyInstance } from 'fastify'
 import formBody from '@fastify/formbody'
 import bearerAuthPlugin from '@fastify/bearer-auth'
-import { Page, BrowserLaunchArgumentOptions } from 'puppeteer'
+import {
+  BrowserLaunchArgumentOptions,
+  Page,
+  ScreenshotOptions,
+} from 'puppeteer'
 import { hcPages } from '@uyamazak/fastify-hc-pages'
 import { hcPDFOptionsPlugin } from './plugins/pdf-options'
 import { AppConfig, GetQuerystring, PostBody } from './types/hc-pdf-server'
 import {
-  DEFAULT_PRESET_PDF_OPTIONS_NAME,
-  BEARER_AUTH_SECRET_KEY,
-  PAGES_NUM,
-  USER_AGENT,
-  PAGE_TIMEOUT_MILLISECONDS,
-  PRESET_PDF_OPTIONS_FILE_PATH,
-  EMULATE_MEDIA_TYPE_SCREEN_ENABLED,
   ACCEPT_LANGUAGE,
-  FASTIFY_LOG_LEVEL,
-  FASTIFY_BODY_LIMIT,
-  DEFAULT_VIEWPORT,
+  BEARER_AUTH_SECRET_KEY,
   BROWSER_LAUNCH_ARGS,
+  DEFAULT_PRESET_PDF_OPTIONS_NAME,
+  DEFAULT_VIEWPORT,
+  EMULATE_MEDIA_TYPE_SCREEN_ENABLED,
+  FASTIFY_BODY_LIMIT,
+  FASTIFY_LOG_LEVEL,
+  PAGE_TIMEOUT_MILLISECONDS,
+  PAGES_NUM,
+  PRESET_PDF_OPTIONS_FILE_PATH,
+  USER_AGENT,
 } from './config'
 
 const getSchema = {
@@ -36,6 +40,15 @@ const postSchema = {
 
 const createPDFHttpHeader = (buffer: Buffer) => ({
   'Content-Type': 'application/pdf',
+  'Content-Length': buffer.length,
+  // prevent cache
+  'Cache-Control': 'no-cache, no-store, must-revalidate',
+  Pragma: 'no-cache',
+  Expires: 0,
+})
+
+const createScreenshotHttpHeader = (buffer: string | Buffer) => ({
+  'Content-Type': 'image/png',
   'Content-Length': buffer.length,
   // prevent cache
   'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -128,10 +141,11 @@ export const app = async (
       request.query.pdf_option ?? defaultPresetPdfOptionsName
     try {
       const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
-        await page.goto(url)
+        await page.goto(url, {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        })
         const pdfOptions = server.getPDFOptions(pdfOptionsQuery)
-        const buffer = await page.pdf(pdfOptions)
-        return buffer
+        return await page.pdf(pdfOptions)
       })
       reply.headers(createPDFHttpHeader(buffer))
       reply.send(buffer)
@@ -160,9 +174,10 @@ export const app = async (
 
     try {
       const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
-        await page.setContent(html, { waitUntil: ['domcontentloaded'] })
-        const buffer = await page.pdf(pdfOptions)
-        return buffer
+        await page.setContent(html, {
+          waitUntil: ['domcontentloaded', 'networkidle0'],
+        })
+        return await page.pdf(pdfOptions)
       })
       reply.headers(createPDFHttpHeader(buffer))
       reply.send(buffer)
@@ -175,6 +190,43 @@ export const app = async (
 
   server.get('/pdf_options', (_, reply) => {
     reply.send(server.getPresetPDFOptions())
+  })
+
+  server.get<{
+    Querystring: GetQuerystring
+  }>('/screenshot', { schema: getSchema }, async (request, reply) => {
+    const { url, w, h } = request.query
+    if (!url) {
+      reply.code(400).send({ error: 'url is required' })
+      return
+    }
+
+    const screenshotOptions: ScreenshotOptions = {}
+    if (w && h) {
+      screenshotOptions.clip = {
+        x: 0,
+        y: 0,
+        width: w,
+        height: h,
+      }
+      screenshotOptions.captureBeyondViewport = false
+    } else {
+      screenshotOptions.fullPage = true
+    }
+    try {
+      const buffer = await server.runOnPage<string | Buffer>(
+        async (page: Page) => {
+          await page.goto(url)
+          return await page.screenshot(screenshotOptions)
+        }
+      )
+      reply.headers(createScreenshotHttpHeader(buffer))
+      reply.send(buffer)
+    } catch (error) {
+      console.error(`error ${error}`)
+      reply.code(500).send({ error, url })
+      return
+    }
   })
 
   return server

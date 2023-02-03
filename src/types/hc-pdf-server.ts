@@ -3,6 +3,8 @@ import { Viewport } from 'puppeteer'
 export interface GetQuerystring {
   url: string
   pdf_option?: string
+  w?: number
+  h?: number
 }
 
 export interface PostBody {
