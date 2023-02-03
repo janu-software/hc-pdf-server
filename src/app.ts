@@ -216,6 +216,12 @@ export const app = async (
     try {
       const buffer = await server.runOnPage<string | Buffer>(
         async (page: Page) => {
+          if (w && h) {
+            await page.setViewport({
+              width: parseInt(w),
+              height: parseInt(h),
+            })
+          }
           await page.goto(url)
           return await page.screenshot(screenshotOptions)
         }
