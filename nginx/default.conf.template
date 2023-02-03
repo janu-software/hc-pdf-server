@@ -11,4 +11,8 @@ server {
     location / {
         proxy_pass http://service$request_uri;
     }
+
+    location /screenshot {
+        proxy_pass http://pdf_n_3:8080$request_uri;
+    }
 }
