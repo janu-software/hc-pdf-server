@@ -111,6 +111,12 @@ export const app = async (
 
   server.get<{
     Querystring: GetQuerystring
+  }>('/hc', { schema: getSchema }, async (request, reply) => {
+    reply.send('ok')
+  })
+
+  server.get<{
+    Querystring: GetQuerystring
   }>('/', { schema: getSchema }, async (request, reply) => {
     const { url } = request.query
     if (!url) {
