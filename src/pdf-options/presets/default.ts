@@ -64,7 +64,6 @@ export const PresetPDFOptions: { [key: string]: PDFOptions } = {
     margin: zeroMargin,
     printBackground: true,
     preferCSSPageSize: true,
-    scale: 1.1,
   },
   A4LandscapeFull: {
     format: 'a4',
@@ -72,6 +71,5 @@ export const PresetPDFOptions: { [key: string]: PDFOptions } = {
     margin: zeroMargin,
     printBackground: true,
     preferCSSPageSize: true,
-    scale: 1.,
   },
 }
