@@ -226,10 +226,10 @@ export const app = async (
           // Try to accept cookies
           await page.evaluate(() => {
             function xcc_contains(selector: string, text: string | RegExp) {
-              const elements = document.querySelectorAll(selector);
+              const elements = document.querySelectorAll(selector)
               return Array.prototype.filter.call(elements, function (element) {
                 return RegExp(text, 'i').test(element.textContent.trim())
-              });
+              })
             }
             const _xcc = xcc_contains(
               '[id*=cookie] a, [class*=cookie] a, [id*=cookie] button, [class*=cookie] button, [data-cookiebanner*=accept] button',
