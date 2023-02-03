@@ -18,6 +18,13 @@ const defaultMargin: PDFMargin = {
   right: DEFAULT_PDF_OPTION_MARGIN,
 }
 
+const zeroMargin: PDFMargin = {
+  top: '0mm',
+  bottom: '0mm',
+  left: '0mm',
+  right: '0mm',
+}
+
 export const PresetPDFOptions: { [key: string]: PDFOptions } = {
   DEFAULT: {
     format: DEFAULT_PDF_OPTION_FORMAT,
@@ -45,6 +52,17 @@ export const PresetPDFOptions: { [key: string]: PDFOptions } = {
     format: 'a3',
     landscape: true,
     margin: defaultMargin,
+    printBackground: true,
+  },
+  A4Full: {
+    format: 'a4',
+    margin: zeroMargin,
+    printBackground: true,
+  },
+  A4LandscapeFull: {
+    format: 'a4',
+    landscape: true,
+    margin: zeroMargin,
     printBackground: true,
   },
 }
