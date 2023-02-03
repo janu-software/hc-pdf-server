@@ -206,8 +206,8 @@ export const app = async (
       screenshotOptions.clip = {
         x: 0,
         y: 0,
-        width: w,
-        height: h,
+        width: parseInt(w),
+        height: parseInt(h),
       }
       screenshotOptions.captureBeyondViewport = false
     } else {
