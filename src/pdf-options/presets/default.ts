@@ -46,6 +46,7 @@ export const PresetPDFOptions: { [key: string]: PDFOptions } = {
     format: 'a4',
     landscape: true,
     margin: defaultMargin,
+    scale: 1.1,
     printBackground: true,
   },
   A3L: {
@@ -58,11 +59,13 @@ export const PresetPDFOptions: { [key: string]: PDFOptions } = {
     format: 'a4',
     margin: zeroMargin,
     printBackground: true,
+    scale: 1.1,
   },
   A4LandscapeFull: {
     format: 'a4',
     landscape: true,
     margin: zeroMargin,
     printBackground: true,
+    scale: 1.1,
   },
 }
