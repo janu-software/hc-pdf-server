@@ -11,12 +11,12 @@ services:
     depends_on:
       - service1
   service1: &service_1
-    container_name: pdf_1
+    container_name: pdf_n_1
     image: hc-pdf-server:latest
     restart: always
   service2:
     <<: *service_1
-    container_name: pdf_2
+    container_name: pdf_n_2
   service3:
     <<: *service_1
-    container_name: pdf_3
+    container_name: pdf_n_3

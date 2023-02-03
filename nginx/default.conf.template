@@ -1,7 +1,7 @@
 upstream service {
-    server pdf_1:8080;
-    server pdf_2:8080;
-    server pdf_3:8080;
+    server pdf_n_1:8080;
+    server pdf_n_2:8080;
+    server pdf_n_3:8080;
 }
 
 server {
