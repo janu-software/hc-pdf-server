@@ -10,6 +10,8 @@ export interface GetQuerystring {
 export interface PostBody {
   html: string
   pdf_option?: string
+  w?: string
+  h?: string
 }
 
 export interface AppConfig {

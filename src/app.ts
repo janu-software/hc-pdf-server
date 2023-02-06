@@ -251,5 +251,73 @@ export const app = async (
     }
   })
 
+  server.post<{
+    Body: PostBody
+  }>('/screenshot', { schema: getSchema }, async (request, reply) => {
+    const body = request.body ?? null
+    if (!body) {
+      reply.code(400).send({ error: 'request body is empty' })
+      return
+    }
+    const html = body.html ?? ''
+    const w = body.w ?? null
+    const h = body.h ?? null
+    if (!html) {
+      reply.code(400).send({ error: 'html is required' })
+      return
+    }
+
+    const screenshotOptions: ScreenshotOptions = {}
+    if (w && h) {
+      screenshotOptions.clip = {
+        x: 0,
+        y: 0,
+        width: parseInt(w),
+        height: parseInt(h),
+      }
+      screenshotOptions.captureBeyondViewport = false
+    } else {
+      screenshotOptions.fullPage = true
+    }
+    try {
+      const buffer = await server.runOnPage<string | Buffer>(
+        async (page: Page) => {
+          if (w && h) {
+            await page.setViewport({
+              width: parseInt(w),
+              height: parseInt(h),
+            })
+          }
+          await page.setContent(html, {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          })
+          // Try to accept cookies
+          await page.evaluate(() => {
+            function xcc_contains(selector: string, text: string | RegExp) {
+              const elements = document.querySelectorAll(selector)
+              return Array.prototype.filter.call(elements, function (element) {
+                return RegExp(text, 'i').test(element.textContent.trim())
+              })
+            }
+            const _xcc = xcc_contains(
+              '[id*=cookie] a, [class*=cookie] a, [id*=cookie] button, [class*=cookie] button, [data-cookiebanner*=accept] button',
+              '^(Alle akzeptieren|Akzeptieren|Verstanden|Zustimmen|Okay|OK)$'
+            )
+            if (_xcc != null && _xcc.length !== 0) {
+              _xcc[0].click()
+            }
+          })
+          return await page.screenshot(screenshotOptions)
+        }
+      )
+      reply.headers(createScreenshotHttpHeader(buffer))
+      reply.send(buffer)
+    } catch (error) {
+      console.error(`error ${error}`)
+      reply.code(500).send({ error, html })
+      return
+    }
+  })
+
   return server
 }
