@@ -4,6 +4,7 @@ services:
   nginx:
     image: nginx
     container_name: pdf_n_proxy
+    restart: always
     volumes:
       - ./nginx:/etc/nginx/templates
     ports:
