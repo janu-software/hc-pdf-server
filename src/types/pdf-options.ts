@@ -6,3 +6,6 @@ export interface PresetPDFOptions {
 export interface PresetPDFOptionsModule {
   PresetPDFOptions: PresetPDFOptions
 }
+export interface PresetPDFOptionsLoaderConfig {
+  filePath: string
+}
