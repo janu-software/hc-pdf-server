@@ -1,11 +1,11 @@
 import { PDFOptions } from 'puppeteer'
-import { FastifyInstance } from 'fastify'
+import {FastifyPluginCallback} from 'fastify'
 import fp from 'fastify-plugin'
 import {
   PresetPDFOptions,
-  PresetPDFOptionsLoaderConfig,
   PresetPDFOptionsModule,
 } from '../types/pdf-options'
+import {FastifyPluginOptions} from "fastify/types/plugin";
 
 export class PresetPDFOptionsLoader {
   preset: PresetPDFOptions
@@ -16,7 +16,7 @@ export class PresetPDFOptionsLoader {
   }
 
   static async init(
-    config: PresetPDFOptionsLoaderConfig
+    config: FastifyPluginOptions
   ): Promise<PresetPDFOptionsLoader> {
     const preset = await this.loadPDFOptionsPreset(config.filePath)
     if (!config.filePath) {
@@ -44,11 +44,7 @@ export class PresetPDFOptionsLoader {
   }
 }
 
-async function plugin(
-  fastify: FastifyInstance,
-  options: PresetPDFOptionsLoaderConfig,
-  next: (err?: Error) => void
-) {
+const plugin: FastifyPluginCallback = async (fastify, options, done) => {
   const presetPDFOptionsLoader = await PresetPDFOptionsLoader.init(options)
   fastify.decorate('getPDFOptions', (name?: string) => {
     return presetPDFOptionsLoader.get(name)
@@ -56,17 +52,10 @@ async function plugin(
   fastify.decorate('getPresetPDFOptions', () => {
     return presetPDFOptionsLoader.preset
   })
-  next()
+  done()
 }
 
 export const hcPDFOptionsPlugin = fp(plugin, {
   fastify: '^4.0.0',
   name: 'hc-pdf-options-plugin',
 })
-
-declare module 'fastify' {
-  interface FastifyInstance {
-    getPDFOptions(name?: string): PDFOptions
-    getPresetPDFOptions(): PresetPDFOptions
-  }
-}
