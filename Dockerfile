@@ -1,5 +1,5 @@
 # https://github.com/uyamazak/hc-pdf-server
-FROM node:18-buster-slim as package_install
+FROM --platform=linux/amd64 node:18-buster-slim as package_install
 LABEL maintainer="uyamazak<yu.yamazaki85@gmail.com>"
 COPY package.json yarn.lock /app/
 WORKDIR /app
@@ -9,7 +9,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 RUN ["yarn", "install", "--frozen-lockfile"]
 
 
-FROM node:18-buster-slim
+FROM --platform=linux/amd64 node:18-buster-slim
 # Fastify in docker needs 0.0.0.0
 # https://github.com/fastify/fastify/issues/935
 ENV HCPDF_SERVER_ADDRESS=0.0.0.0
@@ -22,9 +22,8 @@ RUN apt-get update \
   && apt-get install -y wget gnupg \
   && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
   && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-  && apt-get update && apt-get upgrade -y
-RUN apt-get install -y ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1
-RUN apt-get install -y google-chrome-beta \
+  && apt-get update && apt-get upgrade -y \
+  && apt-get install -y google-chrome-stable ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1 \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
@@ -34,7 +33,7 @@ RUN fc-cache -fv
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-  PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-beta
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 EXPOSE 8080
 
