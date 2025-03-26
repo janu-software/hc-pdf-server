@@ -19,7 +19,7 @@ services:
       mode: replicated
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: always
       placement:
         constraints:
           - node.role == manager  # Běží pouze na manager nodu
@@ -28,5 +28,7 @@ networks:
   pdf-net:
     driver: overlay
 
-# docker service create --name pdf-server hc-pdf-server:latest
-# docker service update --image hc-pdf-server:latest pdf-server
+# docker build -t hc-pdf-server:latest .
+# docker stack deploy -c docker-compose.yml pdf-stack
+# docker stack deploy --detach=false -c docker-compose.yml pdf-stack
+# docker service scale pdf-stack_worker=2
