@@ -19,7 +19,7 @@ services:
       mode: replicated
       replicas: 1
       restart_policy:
-        condition: always
+        condition: any
       placement:
         constraints:
           - node.role == manager  # Běží pouze na manager nodu
