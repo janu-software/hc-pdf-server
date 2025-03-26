@@ -1,14 +1,28 @@
-version: "3.8"
-
 services:
   worker:
-    name: pdf-server
     image: hc-pdf-server:latest
-    ports:
-      - 8101:80
+    networks:
+      - pdf-net
     deploy:
       mode: replicated
       replicas: 3
       endpoint_mode: vip
+  nginx:
+    image: nginx:alpine
+    networks:
+      - pdf-net
+    ports:
+      - 8100:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: vip
 
-# docker service create --name hc-pdf-server hc-pdf-server:latest
+networks:
+  pdf-net:
+    driver: overlay
+
+# docker service create --name pdf-server hc-pdf-server:latest
+# docker service update --image hc-pdf-server:latest pdf-server
