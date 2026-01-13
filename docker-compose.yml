@@ -32,3 +32,5 @@ networks:
 # docker stack deploy -c docker-compose.yml pdf-stack
 # docker stack deploy --detach=false -c docker-compose.yml pdf-stack
 # docker service scale pdf-stack_worker=2
+# run dev one instance
+# docker run -p 8101:8080 hc-pdf-server:latest

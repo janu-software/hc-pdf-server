@@ -141,6 +141,16 @@ export const app = async (
       request.query.pdf_option ?? defaultPresetPdfOptionsName
     try {
       const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
+        // forward cookies from request to target page
+        const cookies = request.headers.cookie
+        if (cookies) {
+          const cookieArray = cookies.split(';').map((cookie) => {
+            const [name, ...rest] = cookie.trim().split('=')
+            const value = rest.join('=')
+            return { name, value, url }
+          })
+          await page.setCookie(...cookieArray)
+        }
         await page.goto(url, {
           waitUntil: 'networkidle0',
         })

@@ -1,5 +1,5 @@
 # https://github.com/uyamazak/hc-pdf-server
-FROM --platform=linux/amd64 node:18-buster-slim as package_install
+FROM node:20-slim AS package_install
 LABEL maintainer="uyamazak<yu.yamazaki85@gmail.com>"
 COPY package.json yarn.lock /app/
 WORKDIR /app
@@ -9,7 +9,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 RUN ["yarn", "install", "--frozen-lockfile"]
 
 
-FROM --platform=linux/amd64 node:18-buster-slim
+FROM node:20-slim AS runtime
 # Fastify in docker needs 0.0.0.0
 # https://github.com/fastify/fastify/issues/935
 ENV HCPDF_SERVER_ADDRESS=0.0.0.0
@@ -19,12 +19,14 @@ ARG ADDITONAL_FONTS=""
 
 # https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker
 RUN apt-get update \
-  && apt-get install -y wget gnupg \
-  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-  && apt-get update && apt-get upgrade -y \
-  && apt-get install -y google-chrome-stable ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1 \
-  --no-install-recommends \
+ && apt-get install -y --no-install-recommends wget gnupg ca-certificates
+RUN mkdir -p /usr/share/keyrings \
+ && wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
+    | gpg --dearmor -o /usr/share/keyrings/google-linux-signing-key.gpg \
+ && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google.list
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y google-chrome-stable ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1 \
   && rm -rf /var/lib/apt/lists/*
 
 # Install fonts from files
