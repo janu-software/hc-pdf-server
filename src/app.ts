@@ -125,6 +125,7 @@ export const app = async (
   server.get<{
     Querystring: GetQuerystring
   }>('/hc', { schema: getSchema }, async (request, reply) => {
+    reply.header('X-Version', process.env.npm_package_version || 'unknown')
     reply.send('ok')
   })
 
