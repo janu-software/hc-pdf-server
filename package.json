@@ -1,14 +1,15 @@
 {
   "name": "hc-pdf-server",
-  "version": "2.2.2",
+  "version": "3.0.0",
   "description": "html to pdf rendering server using Headless Chrome",
   "main": "dist/server.js",
+  "packageManager": "pnpm@10.28.0",
   "directories": {
     "test": "test"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "test": "tap --ts --no-check-coverage --timeout=180 test/**/*.test.ts",
+    "test": "tap --timeout=180 test/**/*.test.ts",
     "start": "node dist/src/server.js",
     "dev": "ts-node ./src/server.ts",
     "lint": "eslint --fix ./ --ext ts"
@@ -30,29 +31,29 @@
   },
   "homepage": "https://github.com/uyamazak/hc-pdf-server#readme",
   "dependencies": {
-    "@uyamazak/fastify-hc-pages": "2.0.2",
-    "fastify": "^4.23.1",
-    "@fastify/bearer-auth": "^9.0.0",
+    "@fastify/bearer-auth": "^10.1.2",
     "@fastify/formbody": "^7.4.0",
-    "fastify-plugin": "^4.5.0",
-    "puppeteer": "^19.8.2"
+    "@uyamazak/fastify-hc-pages": "2.0.2",
+    "fastify": "^4.29.1",
+    "fastify-plugin": "^4.5.1",
+    "puppeteer": "^24.35.0"
   },
   "devDependencies": {
-    "@tsconfig/node12": "^1.0.11",
-    "@types/node": "^20.6.0",
-    "@types/pdf-parse": "^1.1.1",
-    "@types/tap": "^15.0.8",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "^8.49.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-prettier": "^5.0.0",
-    "fastify-cli": "^5.7.1",
-    "pdf-parse": "^1.1.1",
-    "prettier": "^3.0.3",
-    "tap": "^16.3.8",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "@tsconfig/node12": "^12.1.7",
+    "@types/node": "^25.0.8",
+    "@types/pdf-parse": "^1.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "fastify-cli": "^7.4.1",
+    "light-my-request": "^6.6.0",
+    "pdf-parse": "^2.4.5",
+    "prettier": "^3.8.0",
+    "tap": "^21.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

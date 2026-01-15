@@ -1,21 +1,24 @@
 # https://github.com/uyamazak/hc-pdf-server
-FROM node:20-slim AS package_install
+FROM node:22-slim AS package_install
 LABEL maintainer="uyamazak<yu.yamazaki85@gmail.com>"
-COPY package.json yarn.lock /app/
+COPY package.json pnpm-lock.yaml /app/
 WORKDIR /app
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
-RUN ["yarn", "install", "--frozen-lockfile"]
+RUN ["corepack", "enable"]
+RUN ["pnpm", "install"]
 
 
-FROM node:20-slim AS runtime
+FROM node:22-slim AS runtime
 # Fastify in docker needs 0.0.0.0
 # https://github.com/fastify/fastify/issues/935
 ENV HCPDF_SERVER_ADDRESS=0.0.0.0
 
 # Install fonts from debian packages https://packages.debian.org/stable/fonts/
 ARG ADDITONAL_FONTS=""
+
+RUN ["corepack", "enable"]
 
 # https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker
 RUN apt-get update \
@@ -56,9 +59,10 @@ COPY --chown=pptruser:pptruser package.json \
   tsconfig.eslint.json \
   .prettierrc.js \
   /app/
-RUN yarn build
+
+RUN pnpm build
 
 # Run everything after as non-privileged user.
 USER pptruser
 
-CMD ["yarn", "start"]
+CMD ["pnpm", "run", "start"]

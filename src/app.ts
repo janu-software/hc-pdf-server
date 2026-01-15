@@ -1,11 +1,7 @@
 import fastify, { FastifyInstance } from 'fastify'
 import formBody from '@fastify/formbody'
 import bearerAuthPlugin from '@fastify/bearer-auth'
-import {
-  BrowserLaunchArgumentOptions,
-  Page,
-  ScreenshotOptions,
-} from 'puppeteer'
+import { LaunchOptions, Page, ScreenshotOptions } from 'puppeteer'
 import { hcPages } from '@uyamazak/fastify-hc-pages'
 import { hcPDFOptionsPlugin } from './plugins/pdf-options'
 import { AppConfig, GetQuerystring, PostBody } from './types/hc-pdf-server'
@@ -38,7 +34,7 @@ const postSchema = {
   },
 }
 
-const createPDFHttpHeader = (buffer: Buffer) => ({
+const createPDFHttpHeader = (buffer: Uint8Array) => ({
   'Content-Type': 'application/pdf',
   'Content-Length': buffer.length,
   // prevent cache
@@ -47,7 +43,7 @@ const createPDFHttpHeader = (buffer: Buffer) => ({
   Expires: 0,
 })
 
-const createScreenshotHttpHeader = (buffer: string | Buffer) => ({
+const createScreenshotHttpHeader = (buffer: string | Uint8Array) => ({
   'Content-Type': 'image/png',
   'Content-Length': buffer.length,
   // prevent cache
@@ -70,7 +66,7 @@ const defaultAppConfig: AppConfig = {
   viewport: DEFAULT_VIEWPORT,
 }
 
-const buildBrowserLaunchArgs = (): BrowserLaunchArgumentOptions => {
+const buildBrowserLaunchArgs = (): LaunchOptions => {
   return {
     args: BROWSER_LAUNCH_ARGS.trim().split(','),
   }
@@ -114,6 +110,8 @@ export const app = async (
   server.register(hcPages, {
     pagesNum,
     pageOptions,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     launchOptions,
   })
 
@@ -141,7 +139,9 @@ export const app = async (
     const pdfOptionsQuery =
       request.query.pdf_option ?? defaultPresetPdfOptionsName
     try {
-      const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      const buffer = await server.runOnPage<Uint8Array>(async (page: Page) => {
         // forward cookies from request to target page
         const cookies = request.headers.cookie
         if (cookies) {
@@ -186,7 +186,9 @@ export const app = async (
     const pdfOptions = server.getPDFOptions(pdfOptionsQuery)
 
     try {
-      const buffer = await server.runOnPage<Buffer>(async (page: Page) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      const buffer = await server.runOnPage<Uint8Array>(async (page: Page) => {
         await page.setContent(html, {
           waitUntil: ['domcontentloaded', 'networkidle0'],
         })
@@ -227,7 +229,9 @@ export const app = async (
       screenshotOptions.fullPage = true
     }
     try {
-      const buffer = await server.runOnPage<string | Buffer>(
+      const buffer = await server.runOnPage<string | Uint8Array>(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         async (page: Page) => {
           if (w && h) {
             await page.setViewport({
@@ -293,7 +297,9 @@ export const app = async (
       screenshotOptions.fullPage = true
     }
     try {
-      const buffer = await server.runOnPage<string | Buffer>(
+      const buffer = await server.runOnPage<string | Uint8Array>(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         async (page: Page) => {
           if (w && h) {
             await page.setViewport({

@@ -17,7 +17,7 @@ const toNumber = (val: string | undefined) => {
  */
 export const PRESET_PDF_OPTIONS_FILE_PATH =
   process.env.HCPDF_PRESET_PDF_OPTIONS_FILE_PATH ??
-  '../pdf-options/presets/default'
+  '../pdf-options/presets/default.js'
 export const DEFAULT_PRESET_PDF_OPTIONS_NAME =
   process.env.HCPDF_DEFAULT_PRESET_PDF_OPTIONS_NAME ?? 'DEFAULT'
 
@@ -80,8 +80,8 @@ export const TEST_POST_HTML =
  * @see https://pptr.dev/#?product=Puppeteer&show=api-pageviewport
  */
 export const DEFAULT_VIEWPORT = {
-  width: toNumber(process.env.HCPDF_VIEWPORT_WIDTH) ?? 800,
-  height: toNumber(process.env.HCPDF_VIEWPORT_HEIGHT) ?? 600,
+  width: toNumber(process.env.HCPDF_VIEWPORT_WIDTH) ?? 1280,
+  height: toNumber(process.env.HCPDF_VIEWPORT_HEIGHT) ?? 900,
   deviceScaleFactor: toNumber(process.env.HCPDF_DEVICE_SCALE_FACTOR) ?? 1,
   isMobile: toBoolean(process.env.HCPDF_VIEWPORT_IS_MOBILE),
   isLandscape: toBoolean(process.env.HCPDF_VIEWPORT_HAS_TOUCH),

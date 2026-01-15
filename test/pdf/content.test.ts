@@ -1,7 +1,7 @@
 import { test } from 'tap'
 import { InjectOptions } from 'light-my-request'
 import { app } from '../../src/app'
-import pdf from 'pdf-parse'
+import { PDFParse } from 'pdf-parse'
 
 interface Test {
   teardown(cb: unknown): unknown
@@ -27,9 +27,12 @@ test('PDF content test', async (t) => {
     })
     const responses = await Promise.all(requests)
     for (const n of testNumbers) {
-      const pdfResult = await pdf(responses[n].rawPayload)
+      const parser = new PDFParse({ data: responses[n].rawPayload })
+      const text = await parser.getText().finally(async () => {
+        await parser.destroy()
+      })
       // remove line breaks
-      const pdfText = pdfResult.text.trim()
+      const pdfText = text.text.trim()
       t.equal(pdfText, `test-${n}`)
     }
     t.end()
