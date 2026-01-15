@@ -157,6 +157,11 @@ export const app = async (
         await page.goto(url, {
           waitUntil: 'networkidle0',
         })
+        if (request.query.wait_for_ready) {
+          await page.waitForSelector('html[data-pdf-ready="true"]', {
+            timeout: 30000,
+          })
+        }
         const pdfOptions = server.getPDFOptions(pdfOptionsQuery)
         return await page.pdf(pdfOptions)
       })

@@ -3,6 +3,7 @@ import { Viewport } from 'puppeteer'
 export interface GetQuerystring {
   url: string
   pdf_option?: string
+  wait_for_ready?: string
   w?: string
   h?: string
 }
