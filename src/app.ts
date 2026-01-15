@@ -149,8 +149,10 @@ export const app = async (
             const value = rest.join('=')
             return { name, value, url }
           })
+          console.log('cookies', cookies)
           await page.setCookie(...cookieArray)
         }
+        console.log(`Navigating to URL: ${url}`)
         await page.goto(url, {
           waitUntil: 'networkidle0',
         })
