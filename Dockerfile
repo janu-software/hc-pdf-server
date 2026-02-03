@@ -34,7 +34,7 @@ RUN apt-get install --no-install-recommends -y \
     ${ADDITONAL_FONTS} \
     fonts-freefont-ttf \
     libxss1 \
-    libproxy1 \
+    libproxy1v5 \
     glib-networking \
     libnss3 \
   && rm -rf /var/lib/apt/lists/*
