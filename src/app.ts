@@ -69,7 +69,7 @@ const defaultAppConfig: AppConfig = {
 
 const buildBrowserLaunchArgs = async (): Promise<LaunchOptions> => {
   const args = BROWSER_LAUNCH_ARGS.trim().split(';')
-  const upstreamProxy = 'http://mhiaebta-rotate:twqlubqx2pvs@p.webshare.io:80'
+  const upstreamProxy = 'http://p.webshare.io:80'
 
   const localProxy = await proxyChain.anonymizeProxy(upstreamProxy)
   args.push(`--proxy-server=${localProxy}`)
