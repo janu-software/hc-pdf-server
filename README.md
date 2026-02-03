@@ -333,7 +333,7 @@ default: false
 
 ## Browser Launch Options
 ### HCEP_DEFAULT_BROWSER_LAUNCH_ARGS
-`args` of browser launch options. Comma separated string needed.
+`args` of browser launch options. Semicolon separated string needed.
 
 default: '--no-sandbox,--disable-setuid-sandbox,--disable-gpu,--disable-dev-shm-usage'
 
