@@ -5,7 +5,7 @@ import { LaunchOptions, Page, ScreenshotOptions } from 'puppeteer'
 import { hcPages } from '@uyamazak/fastify-hc-pages'
 import { hcPDFOptionsPlugin } from './plugins/pdf-options'
 import { AppConfig, GetQuerystring, PostBody } from './types/hc-pdf-server'
-import * as proxyChain from 'proxy-chain'
+import { anonymizeProxy } from 'proxy-chain'
 import {
   ACCEPT_LANGUAGE,
   BEARER_AUTH_SECRET_KEY,
@@ -71,7 +71,7 @@ const buildBrowserLaunchArgs = async (): Promise<LaunchOptions> => {
   const args = BROWSER_LAUNCH_ARGS.trim().split(';')
   const upstreamProxy = 'http://p.webshare.io:80'
 
-  const localProxy = await proxyChain.anonymizeProxy(upstreamProxy)
+  const localProxy = await anonymizeProxy(upstreamProxy)
   args.push(`--proxy-server=${localProxy}`)
   args.push('--proxy-bypass-list=<-loopback>,gas-online.cz,*.gas-online.cz')
   return {
