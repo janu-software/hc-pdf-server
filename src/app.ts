@@ -5,7 +5,7 @@ import { LaunchOptions, Page, ScreenshotOptions } from 'puppeteer'
 import { hcPages } from '@uyamazak/fastify-hc-pages'
 import { hcPDFOptionsPlugin } from './plugins/pdf-options'
 import { AppConfig, GetQuerystring, PostBody } from './types/hc-pdf-server'
-import proxyChain from 'proxy-chain'
+import * as proxyChain from 'proxy-chain'
 import {
   ACCEPT_LANGUAGE,
   BEARER_AUTH_SECRET_KEY,
