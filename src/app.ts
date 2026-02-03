@@ -238,10 +238,6 @@ export const app = async (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         async (page: Page) => {
-          await page.authenticate({
-            username: 'mhiaebta-rotate',
-            password: 'twqlubqx2pvs',
-          })
           page.on('requestfailed', (req) => {
             console.error('REQUEST FAILED:', {
               url: req.url(),
