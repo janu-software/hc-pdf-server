@@ -245,21 +245,6 @@ export const app = async (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         async (page: Page) => {
-          page.on('requestfailed', (req) => {
-            console.error('REQUEST FAILED:', {
-              url: req.url(),
-              error: req.failure()?.errorText,
-            })
-          })
-
-          page.on('pageerror', (err) => {
-            console.error('PAGE ERROR:', err)
-          })
-
-          page.on('error', (err) => {
-            console.error('BROWSER ERROR:', err)
-          })
-
           if (w && h) {
             await page.setViewport({
               width: parseInt(w),
