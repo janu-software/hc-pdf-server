@@ -29,7 +29,14 @@ RUN mkdir -p /usr/share/keyrings \
  && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
     > /etc/apt/sources.list.d/google.list
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y google-chrome-stable ${ADDITONAL_FONTS} fonts-freefont-ttf libxss1 \
+RUN apt-get install --no-install-recommends -y \
+    google-chrome-stable \
+    ${ADDITONAL_FONTS} \
+    fonts-freefont-ttf \
+    libxss1 \
+    libproxy1 \
+    glib-networking \
+    libnss3 \
   && rm -rf /var/lib/apt/lists/*
 
 # Install fonts from files
