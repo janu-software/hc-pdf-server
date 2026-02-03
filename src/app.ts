@@ -244,7 +244,11 @@ export const app = async (
               height: parseInt(h),
             })
           }
-          await page.goto(url)
+          await page.goto(url, {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+          })
+          // wait for dynamic content to load
+          await Promise.resolve(() => setTimeout(() => {}, 250))
           // Try to accept cookies
           await page.evaluate(() => {
             function xcc_contains(selector: string, text: string | RegExp) {
@@ -315,6 +319,10 @@ export const app = async (
           await page.setContent(html, {
             waitUntil: ['domcontentloaded', 'networkidle0'],
           })
+
+          // wait for dynamic content to load
+          await Promise.resolve(() => setTimeout(() => {}, 250))
+
           // Try to accept cookies
           await page.evaluate(() => {
             function xcc_contains(selector: string, text: string | RegExp) {
