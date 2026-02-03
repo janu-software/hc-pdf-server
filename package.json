@@ -36,14 +36,14 @@
     "@uyamazak/fastify-hc-pages": "2.0.2",
     "fastify": "^4.29.1",
     "fastify-plugin": "^4.5.1",
-    "puppeteer": "^24.35.0"
+    "puppeteer": "^24.36.1"
   },
   "devDependencies": {
     "@tsconfig/node12": "^12.1.7",
-    "@types/node": "^25.0.8",
+    "@types/node": "^25.2.0",
     "@types/pdf-parse": "^1.1.5",
-    "@typescript-eslint/eslint-plugin": "^8.53.0",
-    "@typescript-eslint/parser": "^8.53.0",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -51,7 +51,7 @@
     "fastify-cli": "^7.4.1",
     "light-my-request": "^6.6.0",
     "pdf-parse": "^2.4.5",
-    "prettier": "^3.8.0",
+    "prettier": "^3.8.1",
     "tap": "^21.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
