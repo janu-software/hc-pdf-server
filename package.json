@@ -36,6 +36,7 @@
     "@uyamazak/fastify-hc-pages": "2.0.2",
     "fastify": "^4.29.1",
     "fastify-plugin": "^4.5.1",
+    "proxy-chain": "^2.7.1",
     "puppeteer": "^24.36.1"
   },
   "devDependencies": {

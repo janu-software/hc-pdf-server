@@ -5,6 +5,7 @@ import { LaunchOptions, Page, ScreenshotOptions } from 'puppeteer'
 import { hcPages } from '@uyamazak/fastify-hc-pages'
 import { hcPDFOptionsPlugin } from './plugins/pdf-options'
 import { AppConfig, GetQuerystring, PostBody } from './types/hc-pdf-server'
+import proxyChain from 'proxy-chain'
 import {
   ACCEPT_LANGUAGE,
   BEARER_AUTH_SECRET_KEY,
@@ -66,9 +67,15 @@ const defaultAppConfig: AppConfig = {
   viewport: DEFAULT_VIEWPORT,
 }
 
-const buildBrowserLaunchArgs = (): LaunchOptions => {
+const buildBrowserLaunchArgs = async (): Promise<LaunchOptions> => {
+  const args = BROWSER_LAUNCH_ARGS.trim().split(';')
+  const upstreamProxy = 'http://mhiaebta-rotate:twqlubqx2pvs@p.webshare.io:80'
+
+  const localProxy = await proxyChain.anonymizeProxy(upstreamProxy)
+  args.push(`--proxy-server=${localProxy}`)
+  args.push('--proxy-bypass-list=<-loopback>,gas-online.cz,*.gas-online.cz')
   return {
-    args: BROWSER_LAUNCH_ARGS.trim().split(';'),
+    args,
   }
 }
 
@@ -105,7 +112,7 @@ export const app = async (
     viewport,
   }
   console.debug('pageOptions:', pageOptions)
-  const launchOptions = buildBrowserLaunchArgs()
+  const launchOptions = await buildBrowserLaunchArgs()
   console.debug('launchOptions:', launchOptions)
   server.register(hcPages, {
     pagesNum,
@@ -241,7 +248,7 @@ export const app = async (
           page.on('requestfailed', (req) => {
             console.error('REQUEST FAILED:', {
               url: req.url(),
-              error: req.failure()?.errorText
+              error: req.failure()?.errorText,
             })
           })
 

@@ -23,6 +23,9 @@ importers:
       fastify-plugin:
         specifier: ^4.5.1
         version: 4.5.1
+      proxy-chain:
+        specifier: ^2.7.1
+        version: 2.7.1
       puppeteer:
         specifier: ^24.36.1
         version: 24.36.1(typescript@5.9.3)
@@ -2228,6 +2231,10 @@ packages:
     resolution: {integrity: sha512-TmatMXdr2KlRiA2CyDu8GqR8EjahTG3aY3nXjdzFyoZbmB8hrBsTyMezhULIXKnC0jpfjlmiZ3+EaCzoInSu/A==}
     engines: {node: '>= 14'}
 
+  proxy-chain@2.7.1:
+    resolution: {integrity: sha512-LtXu0miohJYrHWJxv8wA6EoGreRcX1hxKb7qlE1pMFH+BXE7bqMvpyhzR/JvR6M5SzYKzyHFpvfmYJrZeMtwAg==}
+    engines: {node: '>=14'}
+
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
@@ -4359,7 +4366,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -5435,6 +5442,14 @@ snapshots:
       pac-proxy-agent: 7.2.0
       proxy-from-env: 1.1.0
       socks-proxy-agent: 8.0.5
+    transitivePeerDependencies:
+      - supports-color
+
+  proxy-chain@2.7.1:
+    dependencies:
+      socks: 2.8.7
+      socks-proxy-agent: 8.0.5
+      tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
