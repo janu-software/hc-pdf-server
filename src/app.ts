@@ -142,11 +142,6 @@ export const app = async (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       const buffer = await server.runOnPage<Uint8Array>(async (page: Page) => {
-        await page.authenticate({
-          username: 'mhiaebta-rotate',
-          password: 'twqlubqx2pvs',
-        })
-
         // forward cookies from request to target page
         const cookies = request.headers.cookie
         if (cookies) {
@@ -199,10 +194,6 @@ export const app = async (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       const buffer = await server.runOnPage<Uint8Array>(async (page: Page) => {
-        await page.authenticate({
-          username: 'mhiaebta-rotate',
-          password: 'twqlubqx2pvs',
-        })
         await page.setContent(html, {
           waitUntil: ['domcontentloaded', 'networkidle0'],
         })
@@ -247,10 +238,6 @@ export const app = async (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         async (page: Page) => {
-          await page.authenticate({
-            username: 'mhiaebta-rotate',
-            password: 'twqlubqx2pvs',
-          })
           if (w && h) {
             await page.setViewport({
               width: parseInt(w),
@@ -323,10 +310,6 @@ export const app = async (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         async (page: Page) => {
-          await page.authenticate({
-            username: 'mhiaebta-rotate',
-            password: 'twqlubqx2pvs',
-          })
           if (w && h) {
             await page.setViewport({
               width: parseInt(w),
