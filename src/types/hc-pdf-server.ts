@@ -11,6 +11,9 @@ export interface GetQuerystring {
 export interface PostBody {
   html: string
   pdf_option?: string
+  wait_for_ready?: boolean | string
+  ready_selector?: string | null
+  base_url?: string | null
   w?: string
   h?: string
 }

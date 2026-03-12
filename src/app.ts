@@ -32,7 +32,89 @@ const postSchema = {
   body: {
     html: { type: 'string' },
     pdf_option: { type: ['null', 'string'] },
+    wait_for_ready: { type: ['null', 'boolean', 'string'] },
+    ready_selector: { type: ['null', 'string'] },
+    base_url: { type: ['null', 'string'] },
   },
+}
+
+const DEFAULT_READY_SELECTOR = 'html[data-pdf-ready="true"]'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const isWaitForReadyEnabled = (value: unknown): boolean => {
+  if (value === true) {
+    return true
+  }
+
+  if (typeof value !== 'string') {
+    return false
+  }
+
+  const normalized = value.trim().toLowerCase()
+  return normalized === '1' || normalized === 'true' || normalized === 'yes'
+}
+
+const injectBaseUrl = (html: string, baseUrl?: string | null): string => {
+  if (!baseUrl || baseUrl.trim() === '' || /<base\s/i.test(html)) {
+    return html
+  }
+
+  const baseTag = `<base href="${baseUrl.trim()}">`
+
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}`)
+  }
+
+  if (/<html[^>]*>/i.test(html)) {
+    return html.replace(/<html([^>]*)>/i, `<html$1><head>${baseTag}</head>`)
+  }
+
+  return `<head>${baseTag}</head>${html}`
+}
+
+const waitForPageAssets = async (
+  page: Page,
+  timeout: number,
+  logger: FastifyInstance['log']
+) => {
+  logger.debug({ timeout }, 'POST / waiting for HTML assets and fonts')
+
+  await page.waitForFunction(
+    () => {
+      const imagesReady = Array.from(document.images).every(
+        (image) => image.complete
+      )
+      const fonts = (
+        document as Document & {
+          fonts?: {
+            status?: string
+            ready?: Promise<unknown>
+          }
+        }
+      ).fonts
+      const fontsReady = !fonts || fonts.status === 'loaded'
+
+      return imagesReady && fontsReady
+    },
+    {
+      timeout,
+    }
+  )
+
+  await page.evaluate(async () => {
+    const fonts = (
+      document as Document & {
+        fonts?: {
+          ready?: Promise<unknown>
+        }
+      }
+    ).fonts
+
+    if (fonts?.ready) {
+      await fonts.ready
+    }
+  })
 }
 
 const createPDFHttpHeader = (buffer: Uint8Array) => ({
@@ -95,6 +177,7 @@ export const app = async (
     fastifyBodyLimit,
     viewport,
   } = { ...defaultAppConfig, ...appConfig }
+  const pageOperationTimeout = pageTimeoutMilliseconds ?? 30000
 
   const server = fastify({
     logger: { level: fastifyLogLevel },
@@ -196,15 +279,84 @@ export const app = async (
     }
     const pdfOptionsQuery = body.pdf_option ?? defaultPresetPdfOptionsName
     const pdfOptions = server.getPDFOptions(pdfOptionsQuery)
+    const waitForReady = isWaitForReadyEnabled(body.wait_for_ready)
+    const readySelector = body.ready_selector?.trim() || DEFAULT_READY_SELECTOR
+    const htmlWithBaseUrl = injectBaseUrl(html, body.base_url)
 
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       const buffer = await server.runOnPage<Uint8Array>(async (page: Page) => {
-        await page.setContent(html, {
-          waitUntil: ['domcontentloaded', 'networkidle0'],
+        const renderStartedAt = Date.now()
+
+        request.log.info(
+          {
+            htmlLength: html.length,
+            htmlWithBaseUrlLength: htmlWithBaseUrl.length,
+            pdfOption: pdfOptionsQuery,
+            waitForReady,
+            readySelector: waitForReady ? readySelector : null,
+            baseUrl: body.base_url ?? null,
+          },
+          'POST / PDF render started'
+        )
+
+        await page.setContent(htmlWithBaseUrl, {
+          waitUntil: 'domcontentloaded',
         })
-        return await page.pdf(pdfOptions)
+        request.log.info(
+          {
+            elapsedMs: Date.now() - renderStartedAt,
+          },
+          'POST / page.setContent finished'
+        )
+
+        if (waitForReady) {
+          request.log.info(
+            {
+              readySelector,
+            },
+            'POST / waiting for ready selector'
+          )
+          await page.waitForSelector(readySelector, {
+            timeout: pageOperationTimeout,
+          })
+          request.log.info(
+            {
+              elapsedMs: Date.now() - renderStartedAt,
+              readySelector,
+            },
+            'POST / ready selector resolved'
+          )
+        }
+
+        await waitForPageAssets(page, pageOperationTimeout, request.log)
+        request.log.info(
+          {
+            elapsedMs: Date.now() - renderStartedAt,
+          },
+          'POST / page assets ready'
+        )
+
+        await sleep(250)
+
+        request.log.info(
+          {
+            elapsedMs: Date.now() - renderStartedAt,
+            pdfOption: pdfOptionsQuery,
+          },
+          'POST / page.pdf started'
+        )
+        const pdfBuffer = await page.pdf(pdfOptions)
+        request.log.info(
+          {
+            elapsedMs: Date.now() - renderStartedAt,
+            pdfBytes: pdfBuffer.length,
+          },
+          'POST / page.pdf finished'
+        )
+
+        return pdfBuffer
       })
       reply.headers(createPDFHttpHeader(buffer))
       reply.send(buffer)
