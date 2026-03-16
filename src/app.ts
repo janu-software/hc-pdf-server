@@ -105,6 +105,10 @@ const dismissCookieConsent = async (page: Page): Promise<void> => {
       #termly-code-snippet-support,
       .hu-cookies-container,
 
+      /* Shadow DOM host elements (custom elements) */
+      tiktok-cookie-banner,
+      usercentrics-cmp,
+
       /* Generic patterns */
       .gdpr-banner,
       .cookie-banner,
@@ -260,6 +264,44 @@ const dismissCookieConsent = async (page: Page): Promise<void> => {
       // Ignore, try next selector
     }
   }
+
+  // Layer 2b: Shadow DOM piercing for custom element consent banners (TikTok, Usercentrics, etc.)
+  await page.evaluate(() => {
+    const shadowHostSelectors = [
+      'tiktok-cookie-banner',
+      'usercentrics-cmp',
+      '#usercentrics-root',
+    ]
+
+    // Multilingual accept button text patterns for shadow DOM buttons
+    const acceptPattern =
+      /^(Povolit vše|Povolit všechny|Přijmout vše|Přijmout všechny|Souhlasím|Accept all|Accept|Allow all|Allow|Alle akzeptieren|Akzeptieren|Tout accepter|Accepter tout|Aceptar todo|Accetta tutto|Zaakceptuj wszystkie|Alles accepteren|Aceitar tudo|Prijať všetky|OK|Okay)$/i
+
+    for (const selector of shadowHostSelectors) {
+      try {
+        const host = document.querySelector(selector)
+        if (!host) continue
+
+        const shadow = host.shadowRoot
+        if (shadow) {
+          // Try to find and click accept button inside shadow DOM
+          const buttons = shadow.querySelectorAll('button, a[role="button"]')
+          for (const btn of Array.from(buttons)) {
+            const text = btn.textContent?.trim() ?? ''
+            if (acceptPattern.test(text)) {
+              ;(btn as HTMLElement).click()
+              break
+            }
+          }
+        }
+
+        // Remove the host element entirely to clean up
+        host.remove()
+      } catch {
+        // Continue to next
+      }
+    }
+  })
 
   // Layer 3: Generic multilingual text-based button matching
   await page.evaluate(() => {
@@ -452,6 +494,10 @@ const dismissCookieConsent = async (page: Page): Promise<void> => {
       '#cookiescript_injected',
       '#cookiescript_injected_fsd',
       '.termly-consent-banner',
+      // Shadow DOM custom elements
+      'tiktok-cookie-banner',
+      '#tiktok-cookie-banner-config',
+      'usercentrics-cmp',
     ]
     for (const selector of removeSelectors) {
       document.querySelectorAll(selector).forEach((el) => el.remove())
