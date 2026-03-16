@@ -265,38 +265,18 @@ const dismissCookieConsent = async (page: Page): Promise<void> => {
     }
   }
 
-  // Layer 2b: Shadow DOM piercing for custom element consent banners (TikTok, Usercentrics, etc.)
+  // Layer 2b: Shadow DOM consent banners (TikTok, Usercentrics, etc.)
+  // Remove the host elements directly — no clicking to avoid confirmation toasts (e.g. TikTok "Uloženo!")
   await page.evaluate(() => {
     const shadowHostSelectors = [
       'tiktok-cookie-banner',
+      '#tiktok-cookie-banner-config',
       'usercentrics-cmp',
       '#usercentrics-root',
     ]
-
-    // Multilingual accept button text patterns for shadow DOM buttons
-    const acceptPattern =
-      /^(Povolit vše|Povolit všechny|Přijmout vše|Přijmout všechny|Souhlasím|Accept all|Accept|Allow all|Allow|Alle akzeptieren|Akzeptieren|Tout accepter|Accepter tout|Aceptar todo|Accetta tutto|Zaakceptuj wszystkie|Alles accepteren|Aceitar tudo|Prijať všetky|OK|Okay)$/i
-
     for (const selector of shadowHostSelectors) {
       try {
-        const host = document.querySelector(selector)
-        if (!host) continue
-
-        const shadow = host.shadowRoot
-        if (shadow) {
-          // Try to find and click accept button inside shadow DOM
-          const buttons = shadow.querySelectorAll('button, a[role="button"]')
-          for (const btn of Array.from(buttons)) {
-            const text = btn.textContent?.trim() ?? ''
-            if (acceptPattern.test(text)) {
-              ;(btn as HTMLElement).click()
-              break
-            }
-          }
-        }
-
-        // Remove the host element entirely to clean up
-        host.remove()
+        document.querySelectorAll(selector).forEach((el) => el.remove())
       } catch {
         // Continue to next
       }
