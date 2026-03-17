@@ -56,9 +56,9 @@ export const ACCEPT_LANGUAGE = process.env.HCPDF_ACCEPT_LANGUAGE ?? undefined
  */
 export const SERVER_ADDRESS = process.env.HCPDF_SERVER_ADDRESS ?? '127.0.0.1'
 export const SERVER_PORT = toNumber(process.env.HCPDF_SERVER_PORT) ?? 8080
-// 10MiB
+// 75MiB
 export const FASTIFY_BODY_LIMIT = toNumber(
-  process.env.HCPDF_FASTIFY_BODY_LIMIT ?? '10485760'
+  process.env.HCPDF_FASTIFY_BODY_LIMIT ?? '78643200'
 )
 // https://www.fastify.io/docs/latest/Logging/
 export const FASTIFY_LOG_LEVEL = process.env.HCPDF_FASTIFY_LOG_LEVEL ?? 'info'
